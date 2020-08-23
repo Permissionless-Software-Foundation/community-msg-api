@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "export COM_ENV=test && npm run prep-test && nyc --reporter=text --timeout 15000 ./node_modules/.bin/mocha --exit",
+    "test": "export COM_ENV=test && npm run prep-test && nyc --reporter=text ./node_modules/.bin/mocha --timeout 15000 --exit test/unit/",
     "lint": "standard --env mocha --fix",
     "docs": "./node_modules/.bin/apidoc -i src/ -o docs",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
@@ -20,6 +20,7 @@
   },
   "repository": "Permissionless-Software-Foundation/community-msg-api",
   "dependencies": {
+    "@psf/bch-js": "^3.5.5",
     "apidoc": "^0.23.0",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
