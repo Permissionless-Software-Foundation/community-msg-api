@@ -26,10 +26,12 @@ class BCHLib {
     }
   }
 
-  // Gets the current block height of the BCH blockchain.
+  // Gets the current block height of the BCH mainnet blockchain.
   async getBlockHeight () {
     try {
       const info = await this.bchjs.Blockchain.getBlockchainInfo()
+      // console.log(`info: ${JSON.stringify(info, null, 2)}`)
+
       return info.blocks
     } catch (err) {
       console.error('Error in bch.js/getBlockHeight()')
