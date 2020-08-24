@@ -23,28 +23,33 @@ class BCHLib {
       // const newTxs = []
 
       const { txs, blockHeightNow } = await this.getTransactions()
-      console.log('txs: ', txs)
+      // console.log('txs: ', txs)
 
       // Loop through each txid.
       for (let i = 0; i < txs.length; i++) {
         const thisTx = txs[i]
 
         const msgExists = await this.Message.find({ txid: thisTx.tx_hash })
-        console.log('msgExists: ', msgExists)
+        // console.log('msgExists: ', msgExists)
 
         // Skip if the tx was found in the database.
-        if (msgExists.length !== 0) continue
+        if (msgExists.length !== 0) {
+          console.log('No new messages detected.')
+          continue
+        }
 
         // Pass the block height along.
         thisTx.blockHeightNow = blockHeightNow
 
         // Create a message object.
         const msgObj = await this.getMessageObj(thisTx)
-        console.log(`msgObj: ${JSON.stringify(msgObj, null, 2)}`)
+        // console.log(`msgObj: ${JSON.stringify(msgObj, null, 2)}`)
 
         // Add the message object to the database.
         const newMsg = new this.Message(msgObj)
         await newMsg.save()
+
+        console.log(`Added new message ${msgObj.txid}`)
       }
     } catch (err) {
       console.error('Error in checkMessages(): ', err)
