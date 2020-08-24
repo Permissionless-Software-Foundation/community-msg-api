@@ -1,7 +1,7 @@
 // const config = require('../config')
 const assert = require('chai').assert
 
-const BCH = require('../src/lib/bch')
+const BCH = require('../../src/lib/bch')
 let uut = {}
 
 describe('#bch', () => {
@@ -13,6 +13,13 @@ describe('#bch', () => {
       // console.log(`info: ${JSON.stringify(info, null, 2)}`)
 
       assert.isAbove(info, 649670)
+    })
+  })
+
+  describe('#getTransactions', () => {
+    it('should get transactions', async () => {
+      const txs = await uut.getTransactions()
+      console.log('txs: ', txs)
     })
   })
 })

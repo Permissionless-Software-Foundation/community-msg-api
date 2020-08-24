@@ -15,6 +15,8 @@ const config = require('../config') // this first.
 const adminLib = require('../src/lib/admin')
 const errorMiddleware = require('../src/middleware')
 const wlogger = require('../src/lib/wlogger')
+const BCH = require('../src/lib/bch')
+const bch = new BCH()
 
 async function startServer () {
   // Create a Koa instance.
@@ -66,6 +68,11 @@ async function startServer () {
   // Create the system admin user.
   const success = await adminLib.createSystemUser()
   if (success) console.log('System admin user created.')
+
+  setInterval(async function () {
+    bch.checkMessages()
+  }, 60000 * 1)
+  // bch.checkMessages()
 
   return app
 }
