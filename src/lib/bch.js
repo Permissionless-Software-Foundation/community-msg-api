@@ -11,7 +11,7 @@ const Message = require('../models/message')
 
 class BCHLib {
   constructor () {
-    this.bchjs = new BCHJS()
+    this.bchjs = new BCHJS({ restURL: 'https://free-main.fullstack.cash/v3/' })
     this.Message = Message
   }
 
@@ -100,7 +100,9 @@ class BCHLib {
 
       // Record or estimate the block height of this transaction.
       let height = tx.blockHeightNow + 1
-      if (tx.height !== 0) { height = tx.height }
+      if (tx.height !== 0) {
+        height = tx.height
+      }
 
       // Generate an ISO timestamp.
       const now = new Date()
