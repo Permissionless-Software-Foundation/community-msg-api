@@ -1,4 +1,4 @@
-const config = require('../config')
+const config = require('../../config')
 const axios = require('axios').default
 const assert = require('chai').assert
 
@@ -32,6 +32,7 @@ describe('Contact', () => {
         assert.include(err.response.data, "Property 'email' must be a string!")
       }
     })
+
     it('should throw error if email property is wrong format', async () => {
       try {
         const options = {
