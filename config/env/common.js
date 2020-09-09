@@ -4,7 +4,7 @@
 */
 
 module.exports = {
-  port: process.env.PORT || 5001,
+  port: process.env.PORT || 5002,
   logPass: 'test',
 
   // Email
