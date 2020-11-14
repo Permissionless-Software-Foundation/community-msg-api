@@ -11,11 +11,11 @@ const LOCALHOST = `http://localhost:${config.port}`
 
 const context = {}
 
-const UserController = require('../src/modules/users/controller')
+const UserController = require('../../src/modules/users/controller')
 let uut
 let sandbox
 
-const mockContext = require('./mocks/ctx-mock').context
+const mockContext = require('../mocks/ctx-mock').context
 
 describe('Users', () => {
   before(async () => {

@@ -8,8 +8,8 @@ const sinon = require('sinon')
 
 const LOCALHOST = `http://localhost:${config.port}`
 
-const mockContext = require('./mocks/ctx-mock').context
-const ContactController = require('../src/modules/contact/controller')
+const mockContext = require('../mocks/ctx-mock').context
+const ContactController = require('../../src/modules/contact/controller')
 let uut
 let sandbox
 
