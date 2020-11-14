@@ -24,7 +24,7 @@ class MessagesController {
   async getMessages (ctx) {
     try {
       const blockHeightNow = await _this.bch.getBlockHeight()
-      const limit = blockHeightNow - 1000
+      const limit = blockHeightNow - 3000
 
       const messages = await _this.Message.find({ height: { $gte: limit } })
       ctx.body = { messages }

@@ -16,8 +16,8 @@ class BCHLib {
   }
 
   // This function is called by a timer in the bin/server.js file.
-  // It checks the blockchain to see if there are any new messages to load into
-  // the database.
+  // It checks the blockchain to see if there are any new community messages to
+  // load into the database.
   async checkMessages () {
     try {
       // const newTxs = []
