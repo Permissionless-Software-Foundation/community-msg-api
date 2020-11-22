@@ -8,11 +8,13 @@ const BCHJS = require('@psf/bch-js')
 // Local libraries.
 const config = require('../../config')
 const Message = require('../models/message')
+const MessagesLib = require('bch-message-lib')
 
 class BCHLib {
   constructor () {
     this.bchjs = new BCHJS({ restURL: 'https://free-main.fullstack.cash/v3/' })
     this.Message = Message
+    this.messagesLib = new MessagesLib({ bchjs: this.bchjs })
   }
 
   // This function is called by a timer in the bin/server.js file.
@@ -203,6 +205,22 @@ class BCHLib {
       return info.blocks
     } catch (err) {
       console.error('Error in bch.js/getBlockHeight()')
+      throw err
+    }
+  }
+
+  // Scan transaction history looking for an associated name
+  async findName (bchAddr) {
+    try {
+      // Validate Input
+      if (!bchAddr || typeof bchAddr !== 'string') {
+        throw new Error('bchAddr must be a string of a BCH address.')
+      }
+
+      const name = await this.messagesLib.memo.findName(bchAddr)
+      return name
+    } catch (err) {
+      console.error('Error in bch.js/findName()')
       throw err
     }
   }
