@@ -217,7 +217,7 @@ class BCHLib {
         throw new Error('bchAddr must be a string of a BCH address.')
       }
 
-      const name = await this.messagesLib.memo.findName(bchAddr)
+      const name = await this.messagesLib.memo.findName(bchAddr, 0)
       return name
     } catch (err) {
       console.error('Error in bch.js/findName()')
