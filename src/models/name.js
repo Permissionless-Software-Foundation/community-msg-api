@@ -7,7 +7,7 @@ const mongoose = require('mongoose')
 const Name = new mongoose.Schema({
   bchAddr: { type: String, default: '', required: true },
   slpAddr: { type: String, default: '' },
-  handle: { type: String, default: '' }
+  name: { type: String, default: '' }
 })
 
 module.exports = mongoose.model('name', Name)
