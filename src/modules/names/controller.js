@@ -1,6 +1,7 @@
 // Local libraries.
 const Name = require('../../models/name')
 const BCH = require('../../lib/bch')
+const wlogger = require('../../lib/wlogger')
 
 let _this
 
@@ -46,7 +47,7 @@ class NamesController {
 
       ctx.body = { name }
     } catch (error) {
-      console.error('Error in src/modules/names/controller/getName()')
+      wlogger.error('Error in src/modules/names/controller/getName():', error)
       ctx.throw(404)
     }
   }

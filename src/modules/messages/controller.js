@@ -1,3 +1,7 @@
+/*
+  REST API controller for *Community* messages.
+*/
+
 // Local libraries.
 const Message = require('../../models/message')
 const BCH = require('../../lib/bch')
@@ -12,7 +16,7 @@ class MessagesController {
   }
 
   /**
-   * @api {get} /messages Get latest messages
+   * @api {get} /messages Get latest community messages
    * @apiPermission messages
    * @apiName GetMessages
    * @apiGroup Messages

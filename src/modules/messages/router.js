@@ -1,3 +1,5 @@
+// *Community* messages.
+
 // const validator = require('../../middleware/validators')
 const CONTROLLER = require('./controller')
 const controller = new CONTROLLER()
