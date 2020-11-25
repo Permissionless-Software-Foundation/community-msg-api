@@ -28,6 +28,11 @@ const deleteName = async (bchAddr) => {
     throw error
   }
 }
+
+const getStoredName = async (bchAddr) => {
+  const result = await NameModel.find({ bchAddr })
+  return result[0]
+}
 describe('Names', () => {
   const bchAddr = 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8m8'
 
@@ -64,6 +69,9 @@ describe('Names', () => {
       try {
         // Mock live network calls.
         sandbox
+          .stub(uut.Name, 'find')
+          .resolves([])
+        sandbox
           .stub(uut.bch, 'findName')
           .resolves('My name')
 
@@ -82,12 +90,40 @@ describe('Names', () => {
         assert.equal(true, false, 'Unexpected result!')
       }
     })
-    it('should return false if name not found in the transactions history', async () => {
+    it('should return "notAvailable" if name not found in the transactions history', async () => {
       try {
         // Mock live network calls.
         sandbox
+          .stub(uut.Name, 'find')
+          .resolves([])
+        sandbox
           .stub(uut.bch, 'findName')
           .resolves(false)
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        ctx.params = { bchAddr }
+
+        await uut.getName(ctx)
+
+        const result = ctx.body
+
+        assert.isString(result.name)
+        assert.equal(result.name, 'notAvailable')
+      } catch (err) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+    it('Should return "notAvailable" if an error occurs when looking up the name in the transaction history', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.Name, 'find')
+          .resolves([])
+        sandbox
+          .stub(uut.bch, 'findName')
+          .throws(new Error('test error'))
 
         const bchAddr = 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp888'
 
@@ -99,9 +135,89 @@ describe('Names', () => {
         await uut.getName(ctx)
 
         const result = ctx.body
+        assert.isString(result.name)
+        assert.equal(result.name, 'notAvailable')
+      } catch (err) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+    it('Should return the scanned name if the timestamp propety is more than the time limit (24 hours)', async () => {
+      try {
+        const storedName = await getStoredName(bchAddr)
+        // set old timestamp
+        storedName.timestamp = new Date('2020-10-23T21:27:11.000').getTime() / 1000
 
-        assert.isBoolean(result.name)
-        assert.equal(result.name, false)
+        // Mock live network calls.
+        sandbox
+          .stub(uut.Name, 'find')
+          .resolves([storedName])
+        sandbox
+          .stub(uut.bch, 'findName')
+          .resolves('MyName From Txs')
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        ctx.params = { bchAddr }
+
+        await uut.getName(ctx)
+
+        const result = ctx.body
+        assert.isString(result.name)
+        assert.equal(result.name, 'MyName From Txs')
+      } catch (err) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+    it('Should return the stored name if the findName() function throw error o returned false', async () => {
+      try {
+        const storedName = await getStoredName(bchAddr)
+        // set old timestamp
+        storedName.timestamp = new Date('2020-10-23T21:27:11.000').getTime() / 1000
+
+        // Mock live network calls.
+        sandbox
+          .stub(uut.Name, 'find')
+          .resolves([storedName])
+        sandbox
+          .stub(uut.bch, 'findName')
+          .resolves(false)
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        ctx.params = { bchAddr }
+
+        await uut.getName(ctx)
+
+        const result = ctx.body
+        assert.isString(result.name)
+        assert.equal(result.name, 'MyName From Txs')
+      } catch (err) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+    it('Should return the stored name if the timestamp propety is less than the time limit (24 hours)', async () => {
+      try {
+        const storedName = await getStoredName(bchAddr)
+        // set old timestamp
+        storedName.timestamp = new Date().getTime() / 1000
+
+        // Mock live network calls.
+        sandbox
+          .stub(uut.Name, 'find')
+          .resolves([storedName])
+
+        // Mock the context object.
+        const ctx = mockContext()
+
+        ctx.params = { bchAddr }
+
+        await uut.getName(ctx)
+
+        const result = ctx.body
+        assert.isString(result.name)
+        assert.equal(result.name, 'MyName From Txs')
       } catch (err) {
         assert.equal(true, false, 'Unexpected result!')
       }
@@ -117,7 +233,7 @@ describe('Names', () => {
         const result = await axios(options)
 
         assert.equal(result.status, 200, 'Status Code 200 expected.')
-        assert.equal(result.data.name, 'My name')
+        assert.isString(result.data.name)
       } catch (err) {
         assert(false, 'Unexpected result')
       }
