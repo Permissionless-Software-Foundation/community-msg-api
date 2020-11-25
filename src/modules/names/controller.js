@@ -10,6 +10,7 @@ class NamesController {
     _this = this
     this.Name = Name
     this.bch = new BCH()
+    this.limitTime = 24
   }
 
   /**
@@ -27,22 +28,67 @@ class NamesController {
       const bchAddr = ctx.params.bchAddr
 
       // Retrieve the name from the database.
-      const message = await _this.Name.find({ bchAddr })
+      const result = await _this.Name.find({ bchAddr })
 
-      let name
+      // Boolean that will indicate if 24 hours has been past
+      // since the last model update
+      let scan = true
+      let name // Represents the name associated to the address
 
-      // If the name does not exist, scan the transaction history of the
-      // address for an OP_RETURN that sets the handle.
-      if (message.length) {
-        name = message[0].name
+      let nameModel = result[0]
+
+      // If a model associated with the bchAddr exist
+      // in the database, gets the name of it
+      if (nameModel) {
+        name = nameModel.name
+        const timestamp = nameModel.timestamp
+
+        // Obtains the time of the last update
+        // that the model got
+        const now = new Date()
+        const lastUpdate = new Date(timestamp * 1000)
+
+        // Calculates the time difference
+        const dateDiff = now.getTime() - lastUpdate.getTime()
+        const hourDiff = Math.floor(dateDiff / 1000 / 60 / 60)
+        // console.log('hourDiff', hourDiff)
+
+        // Stablish the variable as true if more than
+        // 24 hours has passed since the last model update
+        // with the name found in the txs history
+        scan = hourDiff >= _this.limitTime
       } else {
-        name = await _this.bch.findName(bchAddr)
+        // Creates a new model if no results were
+        // found on the database
+        nameModel = new _this.Name({ bchAddr })
+      }
 
-        if (name) {
-          // Stores the name found in the database
-          const nameModel = new _this.Name({ name, bchAddr })
-          await nameModel.save()
+      // Searchs the name associated to the bchAddr in the txs history
+      // if more than 24 hours has passed since the last search
+      // or if theres no name associated on the database
+      if (scan || typeof name === 'undefined') {
+        // If the findName() method returns false or an error,
+        // the name property of the Name model should be set to false.
+        try {
+          name = await _this.bch.findName(bchAddr)
+          if (!name) {
+            // if the function returs false use the stored
+            // name in the database if it exists
+            // otherwise return "notAvailable"
+            name = nameModel.name || 'notAvailable'
+          }
+        } catch (error) {
+          // if the function returs false use the stored
+          // name in the database if it exists
+          // otherwise return "notAvailable"
+          name = nameModel.name || 'notAvailable'
         }
+
+        // Update the timestamp and store
+        // the model in the database
+        nameModel.timestamp = new Date().getTime() / 1000
+        nameModel.name = name
+        await nameModel.save()
       }
 
       ctx.body = { name }
