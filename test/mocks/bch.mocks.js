@@ -104,8 +104,25 @@ const txs = [
     tx_hash: 'da2ad45ab60e7b80b7c3952175a1752b8fabda537d5497e4d11cf5b898831d37'
   }
 ]
+const messages = [
+  {
+    sender: 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8ma',
+    subject: 'Subject',
+    hash: 'QmPD3BaqEJLL74KLFnk1HKYmmCPZkaXBc8dUKcA51a6BjA',
+    txid: 'c42ec10e2196bcf070f6fa0024c368ccab03c52fef2db7583477b59d564db2e2',
+    time: '1605376672'
+  },
+  {
+    sender: 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8ma',
+    subject: 'Subject',
+    hash: 'QmPD3BaqEJLL74KLFnk1HKYmmCPZkaXBc8dUKcA51a6BjA',
+    txid: 'c42ec10e2196bcf070f6fa0024c368ccab03c52fef2db7583477b59d564db2e2',
+    time: '1605376672'
 
+  }
+]
 module.exports = {
   blockchainInfo,
-  txs
+  txs,
+  messages
 }

@@ -78,4 +78,54 @@ describe('#bch', () => {
       }
     })
   })
+  describe('#readMessages', () => {
+    it('should throw an error if a bchAddr is not provided.', async () => {
+      try {
+        await uut.readMessages()
+
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (err) {
+        // console.log(err)
+        assert.include(
+          err.message,
+          'bchAddr must be a string of a BCH address.'
+        )
+      }
+    })
+    it('should throw an error if a numChunks is not a number.', async () => {
+      try {
+        const bchAddr = 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8ma'
+
+        await uut.readMessages(bchAddr, null)
+
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (err) {
+        // console.log(err)
+        assert.include(
+          err.message,
+          'numChunks must be a number'
+        )
+      }
+    })
+    it('should get messages', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.messagesLib.memo, 'readMsgSignal')
+          .resolves(mockData.messages)
+
+        const bchAddr = 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8ma'
+        const result = await uut.readMessages(bchAddr)
+
+        assert.isArray(result)
+        assert.property(result[0], 'hash')
+        assert.property(result[0], 'subject')
+        assert.property(result[0], 'sender')
+        assert.property(result[0], 'txid')
+        assert.property(result[0], 'time')
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+  })
 })
