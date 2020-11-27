@@ -224,6 +224,25 @@ class BCHLib {
       throw err
     }
   }
+
+  async readMessages (bchAddr, numChunks = 1) {
+    try {
+      // Validate Input
+      if (!bchAddr || typeof bchAddr !== 'string') {
+        throw new Error('bchAddr must be a string of a BCH address.')
+      }
+      if (typeof numChunks !== 'number') {
+        throw new Error('numChunks must be a number.')
+      }
+      // The second parameter is 'preface', passing undefined
+      // takes the default value assigned by the library
+      const messages = await this.messagesLib.memo.readMsgSignal(bchAddr, undefined, numChunks)
+      return messages
+    } catch (error) {
+      console.error('Error in bch.js/getMails()')
+      throw error
+    }
+  }
 }
 
 module.exports = BCHLib
