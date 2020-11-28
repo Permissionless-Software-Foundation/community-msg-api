@@ -47,6 +47,11 @@ class BCHLib {
         const msgObj = await this.getMessageObj(thisTx)
         // console.log(`msgObj: ${JSON.stringify(msgObj, null, 2)}`)
 
+        if (!msgObj) {
+          console.log('Invalid message detected. Skipping.')
+          return
+        }
+
         // Add the message object to the database.
         const newMsg = new this.Message(msgObj)
         await newMsg.save()
@@ -63,6 +68,7 @@ class BCHLib {
   async getMessageObj (tx) {
     try {
       const txid = tx.tx_hash
+      console.log(`Processing TXID ${txid}`)
 
       // Get the raw transaction data.
       const txData = await this.bchjs.RawTransactions.getRawTransaction(
@@ -85,20 +91,37 @@ class BCHLib {
       const memoCode = Buffer.from(script[1], 'hex').toString('hex')
 
       // The memo code should match that for sending money & messages.
-      if (memoCode !== '6d24') {
-        console.log('Memo code did not match 6d24!')
+      // https://memo.cash/protocol
+      // 6d02 is a post from the PSF community feed account.
+      // 6d24 is someone sending money to PSF community feed.
+      if (memoCode !== '6d24' && memoCode !== '6d02') {
+        console.log('Memo code did not match 6d24 or 6d02.')
+        console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
+        console.log(`memoCode: ${JSON.stringify(memoCode, null, 2)}`)
         return false
       }
 
       // Get the message.
-      const msg = Buffer.from(script[3], 'hex').toString('ascii')
+      let msg = ''
+      if (memoCode === '6d24') {
+        msg = Buffer.from(script[3], 'hex').toString('ascii')
+      }
+      if (memoCode === '6d02') {
+        msg = Buffer.from(script[2], 'hex').toString('ascii')
+      }
       // const addr = Buffer.from(script[2], 'hex').toString('hex')
 
       // Get the sender.
       const sender = await this.getSender(txData)
       // console.log(`Raw TX Data: ${JSON.stringify(txData, null, 2)}`)
 
-      const { tokenBalance, tokenAge } = await this.getTokenInfo(sender)
+      let tokenBalance = 0
+      let tokenAge = 0
+      if (memoCode === '6d24') {
+        const obj = await this.getTokenInfo(sender)
+        tokenBalance = obj.tokenBalance
+        tokenAge = obj.tokenAge
+      }
 
       // Record or estimate the block height of this transaction.
       let height = tx.blockHeightNow + 1
@@ -236,7 +259,11 @@ class BCHLib {
       }
       // The second parameter is 'preface', passing undefined
       // takes the default value assigned by the library
-      const messages = await this.messagesLib.memo.readMsgSignal(bchAddr, undefined, numChunks)
+      const messages = await this.messagesLib.memo.readMsgSignal(
+        bchAddr,
+        undefined,
+        numChunks
+      )
       return messages
     } catch (error) {
       console.error('Error in bch.js/getMails()')
