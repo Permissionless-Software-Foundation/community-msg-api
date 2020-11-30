@@ -64,7 +64,8 @@ class BCHLib {
   }
 
   // Decode a message on the blockchain and construct a 'message object', which
-  // can be inserted into the database.
+  // can be inserted into the database. This cache's the transaction data, which
+  // cuts down on REST API calls to FullStack.cash.
   async getMessageObj (tx) {
     try {
       const txid = tx.tx_hash
@@ -248,6 +249,16 @@ class BCHLib {
     }
   }
 
+  // Scan transactions for the input bchAddr for messages that comply with the
+  // PS001 specification for message sharing on the BCH blockchain. This
+  // function returns an array of objects containing this information:
+  // {
+  //    hash: "<IPFS hash>",
+  //    subject: "clear text subject on the blockchain",
+  //    sender: "BCH address of the sender",
+  //    txid: "TXID of the message signal",
+  //    time: "timestamp"
+  // }
   async readMessages (bchAddr, numChunks = 1) {
     try {
       // Validate Input
