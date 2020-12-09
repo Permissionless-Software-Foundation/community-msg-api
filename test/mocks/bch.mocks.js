@@ -121,8 +121,177 @@ const messages = [
 
   }
 ]
+
+const mockTokenUtxos = [
+  {
+    height: 656881,
+    tx_hash: '7b0813748b9861b0487bae20568d9fde4691f92c1b8c2db944d6a2186d7394b1',
+    tx_pos: 1,
+    value: 546,
+    satoshis: 546,
+    txid: '7b0813748b9861b0487bae20568d9fde4691f92c1b8c2db944d6a2186d7394b1',
+    vout: 1,
+    utxoType: 'token',
+    transactionType: 'send',
+    tokenId: '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0',
+    tokenTicker: 'PSF',
+    tokenName: 'Permissionless Software Foundation',
+    tokenDocumentUrl: 'psfoundation.cash',
+    tokenDocumentHash: '',
+    decimals: 8,
+    tokenType: 1,
+    tokenQty: 5,
+    isValid: true
+  },
+  {
+    height: 656883,
+    tx_hash: 'f9e1c54f561477749a46c0ed6377150b32a9f876989e09f79a2038afbad9cd7e',
+    tx_pos: 1,
+    value: 546,
+    satoshis: 546,
+    txid: 'f9e1c54f561477749a46c0ed6377150b32a9f876989e09f79a2038afbad9cd7e',
+    vout: 1,
+    utxoType: 'token',
+    transactionType: 'send',
+    tokenId: '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0',
+    tokenTicker: 'PSF',
+    tokenName: 'Permissionless Software Foundation',
+    tokenDocumentUrl: 'psfoundation.cash',
+    tokenDocumentHash: '',
+    decimals: 8,
+    tokenType: 1,
+    tokenQty: 3,
+    isValid: true
+  },
+  {
+    height: 656886,
+    tx_hash: 'b616cd9e19c5182cf026b2ed3ca8352799a797531c06528821cc14b00011b2cc',
+    tx_pos: 1,
+    value: 546,
+    satoshis: 546,
+    txid: 'b616cd9e19c5182cf026b2ed3ca8352799a797531c06528821cc14b00011b2cc',
+    vout: 1,
+    utxoType: 'token',
+    transactionType: 'send',
+    tokenId: '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0',
+    tokenTicker: 'PSF',
+    tokenName: 'Permissionless Software Foundation',
+    tokenDocumentUrl: 'psfoundation.cash',
+    tokenDocumentHash: '',
+    decimals: 8,
+    tokenType: 1,
+    tokenQty: 2.12345678,
+    isValid: true
+  }
+]
+
+const meritHydratedUtxos = [
+  {
+    height: 656881,
+    tx_hash: '7b0813748b9861b0487bae20568d9fde4691f92c1b8c2db944d6a2186d7394b1',
+    tx_pos: 1,
+    value: 546,
+    satoshis: 546,
+    txid: '7b0813748b9861b0487bae20568d9fde4691f92c1b8c2db944d6a2186d7394b1',
+    vout: 1,
+    utxoType: 'token',
+    transactionType: 'send',
+    tokenId: '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0',
+    tokenTicker: 'PSF',
+    tokenName: 'Permissionless Software Foundation',
+    tokenDocumentUrl: 'psfoundation.cash',
+    tokenDocumentHash: '',
+    decimals: 8,
+    tokenType: 1,
+    tokenQty: 5,
+    isValid: true,
+    age: 11,
+    merit: 55
+  },
+  {
+    height: 656883,
+    tx_hash: 'f9e1c54f561477749a46c0ed6377150b32a9f876989e09f79a2038afbad9cd7e',
+    tx_pos: 1,
+    value: 546,
+    satoshis: 546,
+    txid: 'f9e1c54f561477749a46c0ed6377150b32a9f876989e09f79a2038afbad9cd7e',
+    vout: 1,
+    utxoType: 'token',
+    transactionType: 'send',
+    tokenId: '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0',
+    tokenTicker: 'PSF',
+    tokenName: 'Permissionless Software Foundation',
+    tokenDocumentUrl: 'psfoundation.cash',
+    tokenDocumentHash: '',
+    decimals: 8,
+    tokenType: 1,
+    tokenQty: 3,
+    isValid: true,
+    age: 9,
+    merit: 27
+  },
+  {
+    height: 656886,
+    tx_hash: 'b616cd9e19c5182cf026b2ed3ca8352799a797531c06528821cc14b00011b2cc',
+    tx_pos: 1,
+    value: 546,
+    satoshis: 546,
+    txid: 'b616cd9e19c5182cf026b2ed3ca8352799a797531c06528821cc14b00011b2cc',
+    vout: 1,
+    utxoType: 'token',
+    transactionType: 'send',
+    tokenId: '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0',
+    tokenTicker: 'PSF',
+    tokenName: 'Permissionless Software Foundation',
+    tokenDocumentUrl: 'psfoundation.cash',
+    tokenDocumentHash: '',
+    decimals: 8,
+    tokenType: 1,
+    tokenQty: 2.12345678,
+    isValid: true,
+    age: 6,
+    merit: 12
+  }
+]
+const rawTransactions = {
+  txid: '60fece763732d398aaf3afe44b4b5dcd81f61813accbd6b615cbf4815a74aac8',
+  hash: '60fece763732d398aaf3afe44b4b5dcd81f61813accbd6b615cbf4815a74aac8',
+  version: 1,
+  size: 283,
+  locktime: 0,
+  vin: [
+    {
+      txid: 'e1cb9c07751f6352058ec7d3c7724b7d9ec496769a08c30eea88dfbd3eaf37c7',
+      vout: 0,
+      scriptSig: [Object],
+      sequence: 4294967295
+    }
+  ],
+  vout: [
+    {
+      value: 0,
+      n: 0,
+      scriptPubKey: {
+        hex: '6a026d24141da089f65bc1937e87894a69426c05041ef40cef1648656c6c6f2050534620436f6d6d756e697479203a44',
+        addresses: ['bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8ma']
+      }
+
+    },
+    { value: 0.000006, n: 1, scriptPubKey: [Object] },
+    { value: 0.22801157, n: 2, scriptPubKey: [Object] }
+  ],
+  hex: '0100000001c737af3ebddf88ea0ec3089a7696c49e7d4b72c7d3c78e0552631f75079ccbe1000000006b483045022100b27f426afcf03c95dc19d507cd2ff8c1469526c1d04c48cb7fe426315f54db07022018b6f65f3aa7afb5a6523b35f36e0d2b6a654eebf17ce842e02b63c4f4952323412103a7add9f08612d14476f395dcf058409d1ce4b50c84b652329e53e8af5d430c94ffffffff030000000000000000306a026d24141da089f65bc1937e87894a69426c05041ef40cef1648656c6c6f2050534620436f6d6d756e697479203a4458020000000000001976a9141da089f65bc1937e87894a69426c05041ef40cef88ac05eb5b01000000001976a914135239f14e5894b5e415c2ac1cf37e882eb6e1a988ac00000000',
+  blockhash: '00000000000000000295fb14b54fe4d5c5dd627ecf47dcee3dfe4ae25f76a327',
+  confirmations: 208,
+  time: 1607369490,
+  blocktime: 1607369490
+}
+
 module.exports = {
   blockchainInfo,
   txs,
-  messages
+  messages,
+  mockTokenUtxos,
+  meritHydratedUtxos,
+  rawTransactions
 }
