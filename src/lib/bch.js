@@ -29,7 +29,7 @@ class BCHLib {
       // const newTxs = []
 
       const { txs, blockHeightNow } = await this.getTransactions()
-      // console.log('txs: ', txs)
+      console.log('txs: ', txs)
 
       // Loop through each txid.
       for (let i = 0; i < txs.length; i++) {
@@ -40,7 +40,11 @@ class BCHLib {
 
         // Skip if the tx was found in the database.
         if (msgExists.length !== 0) {
-          console.log('No new messages detected.')
+          console.log(
+            `Message with this txid already exists in the database: ${
+              thisTx.tx_hash
+            }`
+          )
           continue
         }
 
@@ -53,7 +57,7 @@ class BCHLib {
 
         if (!msgObj) {
           console.log('Invalid message detected. Skipping.')
-          return
+          continue
         }
 
         // Add the message object to the database.
@@ -103,8 +107,8 @@ class BCHLib {
       // 6d24 is someone sending money to PSF community feed.
       if (memoCode !== '6d24' && memoCode !== '6d02') {
         console.log('Memo code did not match 6d24 or 6d02.')
-        console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
-        console.log(`memoCode: ${JSON.stringify(memoCode, null, 2)}`)
+        // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
+        // console.log(`memoCode: ${JSON.stringify(memoCode, null, 2)}`)
         return false
       }
 
@@ -131,13 +135,22 @@ class BCHLib {
       let tokenBalance = 0
       let tokenAge = 0
       let merit = 0
-      if (memoCode === '6d24') {
-        const obj = await this.getPSFTokenInfo(addr)
 
-        tokenBalance = obj.tokenBalance
-        tokenAge = obj.tokenAge
-        merit = obj.merit
+      if (memoCode === '6d24') {
+        try {
+          const obj = await this.getPSFTokenInfo(addr)
+
+          tokenBalance = obj.tokenBalance
+          tokenAge = obj.tokenAge
+          merit = obj.merit
+        } catch (err) {
+          // Will throw an error if the address no longer has any UTXOs.
+          tokenBalance = 0
+          tokenAge = 0
+          merit = 0
+        }
       }
+
       // Record or estimate the block height of this transaction.
       let height = tx.blockHeightNow + 1
       if (tx.height !== 0) {
@@ -223,7 +236,7 @@ class BCHLib {
       txs = txs.transactions
 
       const unconfirmedTxs = txs.filter(x => x.height === 0)
-      const confirmedTxs = txs.filter(x => x.height > blockHeightNow - 50)
+      const confirmedTxs = txs.filter(x => x.height > blockHeightNow - 10000)
 
       txs = confirmedTxs.concat(unconfirmedTxs)
 
@@ -255,7 +268,7 @@ class BCHLib {
         throw new Error('bchAddr must be a string of a BCH address.')
       }
 
-      const name = await this.messagesLib.memo.findName(bchAddr, 0)
+      const name = await this.messagesLib.memo.findName(bchAddr, 5)
       return name
     } catch (err) {
       console.error('Error in bch.js/findName()')
@@ -291,7 +304,7 @@ class BCHLib {
       )
       return messages
     } catch (error) {
-      console.error('Error in bch.js/getMails()')
+      console.error('Error in bch.js/readMessages()')
       throw error
     }
   }
@@ -339,7 +352,7 @@ class BCHLib {
       // const tokenBalance = await this.messagesLib.merit.bchUtil.util.round2(balance)
       return { merit, tokenAge, tokenBalance }
     } catch (error) {
-      console.error('Error in bch.js/getMails()')
+      console.error('Error in bch.js/getPSFTokenInfo()')
       throw error
     }
   }
