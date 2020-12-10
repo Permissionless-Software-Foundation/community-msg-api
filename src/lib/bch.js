@@ -10,11 +10,15 @@ const config = require('../../config')
 const Message = require('../models/message')
 const MessagesLib = require('bch-message-lib')
 
+const axios = require('axios').default
+const LOCALHOST = `http://localhost:${config.port}`
+
 class BCHLib {
   constructor () {
     this.bchjs = new BCHJS({ restURL: 'https://free-main.fullstack.cash/v3/' })
     this.Message = Message
     this.messagesLib = new MessagesLib({ bchjs: this.bchjs })
+    this.axios = axios
   }
 
   // This function is called by a timer in the bin/server.js file.
@@ -78,9 +82,11 @@ class BCHLib {
       )
 
       // Get the Script of the first output.
-      const script = this.bchjs.Script.toASM(
+      const scriptData = this.bchjs.Script.toASM(
         Buffer.from(txData.vout[0].scriptPubKey.hex, 'hex')
-      ).split(' ')
+      )
+
+      const script = scriptData.split(' ')
 
       // Ensure the first output is an OP_RETURN.
       if (script[0] !== 'OP_RETURN') {
@@ -112,18 +118,26 @@ class BCHLib {
       }
       // const addr = Buffer.from(script[2], 'hex').toString('hex')
 
-      // Get the sender.
-      const sender = await this.getSender(txData)
+      // Get the sender address.
+      const addr = await this.getSender(txData)
+
+      // Get the sender name.
+      const senderName = await this.getName(addr)
+
+      const sender = senderName || addr
+
       // console.log(`Raw TX Data: ${JSON.stringify(txData, null, 2)}`)
 
       let tokenBalance = 0
       let tokenAge = 0
+      let merit = 0
       if (memoCode === '6d24') {
-        const obj = await this.getTokenInfo(sender)
+        const obj = await this.getPSFTokenInfo(addr)
+
         tokenBalance = obj.tokenBalance
         tokenAge = obj.tokenAge
+        merit = obj.merit
       }
-
       // Record or estimate the block height of this transaction.
       let height = tx.blockHeightNow + 1
       if (tx.height !== 0) {
@@ -139,7 +153,7 @@ class BCHLib {
         sender,
         tokenBalance,
         tokenAge,
-        merit: tokenBalance * tokenAge,
+        merit,
         height,
         timestamp: now.toISOString()
       }
@@ -276,6 +290,54 @@ class BCHLib {
         numChunks
       )
       return messages
+    } catch (error) {
+      console.error('Error in bch.js/getMails()')
+      throw error
+    }
+  }
+
+  // Gets an associated name to the bch address if this exists
+  async getName (bchAddr) {
+    try {
+      const options = {
+        method: 'GET',
+        url: `${LOCALHOST}/names/${bchAddr}`
+      }
+
+      const result = await this.axios.request(options)
+      let name = result.data.name
+
+      if (result.data.name === 'notAvailable') {
+        name = false
+      }
+
+      return name
+    } catch (err) {
+      return false
+    }
+  }
+
+  async getPSFTokenInfo (bchAddr) {
+    try {
+      if (!bchAddr || typeof bchAddr !== 'string') {
+        throw new Error('bchAddr must be a string of a BCH address.')
+      }
+      // Get tokens utxos
+      const hydrateUtxos = await this.messagesLib.merit.getTokenUtxos(bchAddr)
+      if (!hydrateUtxos.length) {
+        throw new Error('No utxos avialable!')
+      }
+      // Calculate Merit
+      const meritArr = await this.messagesLib.merit.calcMerit(hydrateUtxos)
+
+      // Filter psf token
+      const psfTokenUtxos = meritArr.filter(x => x.tokenId === config.tokenId)
+
+      const merit = psfTokenUtxos[0].merit
+      const tokenAge = psfTokenUtxos[0].age
+      const tokenBalance = psfTokenUtxos[0].tokenQty
+      // const tokenBalance = await this.messagesLib.merit.bchUtil.util.round2(balance)
+      return { merit, tokenAge, tokenBalance }
     } catch (error) {
       console.error('Error in bch.js/getMails()')
       throw error
