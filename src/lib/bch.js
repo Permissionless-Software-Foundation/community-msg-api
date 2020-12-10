@@ -40,11 +40,11 @@ class BCHLib {
 
         // Skip if the tx was found in the database.
         if (msgExists.length !== 0) {
-          console.log(
-            `Message with this txid already exists in the database: ${
-              thisTx.tx_hash
-            }`
-          )
+          // console.log(
+          //   `Message with this txid already exists in the database: ${
+          //     thisTx.tx_hash
+          //   }`
+          // )
           continue
         }
 
@@ -95,7 +95,12 @@ class BCHLib {
       // Ensure the first output is an OP_RETURN.
       if (script[0] !== 'OP_RETURN') {
         console.log(`txid ${txid} not an OP_RETURN. Skipping.`)
-        return false
+
+        return {
+          txid,
+          isValid: false
+        }
+        // return false
       }
 
       // Get the code to determine what kind of memo.cash command is being used.
@@ -109,7 +114,15 @@ class BCHLib {
         console.log('Memo code did not match 6d24 or 6d02.')
         // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
         // console.log(`memoCode: ${JSON.stringify(memoCode, null, 2)}`)
-        return false
+
+        // Return an invalid msg object, so the data is saved and this TXID
+        // is not processed in the future.
+        return {
+          txid,
+          isValid: false
+        }
+
+        // return false
       }
 
       // Get the message.
@@ -162,6 +175,7 @@ class BCHLib {
 
       const outObj = {
         txid,
+        isValid: true,
         text: msg,
         sender,
         tokenBalance,
@@ -236,7 +250,7 @@ class BCHLib {
       txs = txs.transactions
 
       const unconfirmedTxs = txs.filter(x => x.height === 0)
-      const confirmedTxs = txs.filter(x => x.height > blockHeightNow - 10000)
+      const confirmedTxs = txs.filter(x => x.height > blockHeightNow - 50)
 
       txs = confirmedTxs.concat(unconfirmedTxs)
 

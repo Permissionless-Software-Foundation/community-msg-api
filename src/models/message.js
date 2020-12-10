@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 
 const Message = new mongoose.Schema({
   txid: { type: String, default: '', required: true },
+  isValid: { type: Boolean, default: false },
   text: { type: String, default: '' },
   sender: { type: String, default: '' },
   tokenBalance: { type: Number, default: 0 },
