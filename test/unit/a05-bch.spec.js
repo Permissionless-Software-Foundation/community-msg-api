@@ -224,6 +224,7 @@ describe('#bch', () => {
         assert.equal(true, false, 'Unexpected result!')
       }
     })
+
     it('should return false if the name returned is "notAvailable"', async () => {
       try {
         // Mock live network calls.
@@ -240,6 +241,7 @@ describe('#bch', () => {
         assert.equal(true, false, 'Unexpected result!')
       }
     })
+
     it('should get name', async () => {
       try {
         // Mock live network calls.
@@ -278,7 +280,8 @@ describe('#bch', () => {
         )
       }
     })
-    it('should return false if txid not an OP_RETURN', async () => {
+
+    it('should mark txid invalid if not an OP_RETURN', async () => {
       try {
         // Mock live network calls.
         sandbox
@@ -288,16 +291,23 @@ describe('#bch', () => {
           .stub(uut.bchjs.Script, 'toASM')
           .callsFake(() => { return 'NOT_OP_RETURN 6d24 1da089f65bc1937e87894a69426c05041ef40cef 48656c6c6f2050534620436f6d6d756e697479203a44' })
 
+        const txid = '60fece763732d398aaf3afe44b4b5dcd81f61813accbd6b615cbf4815a74aac8'
+
         const tx = {
-          tx_hash: '60fece763732d398aaf3afe44b4b5dcd81f61813accbd6b615cbf4815a74aac8'
+          tx_hash: txid
         }
+
         const result = await uut.getMessageObj(tx)
-        assert.isFalse(result)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+        assert.equal(result.txid, txid)
+        assert.equal(result.isValid, false)
       } catch (error) {
         assert.equal(true, false, 'Unexpected result!')
       }
     })
-    it('should return false if the script has not memo code', async () => {
+
+    it('should mark txid as invalid if the script has no memo code', async () => {
       try {
         // Mock live network calls.
         sandbox
@@ -307,15 +317,22 @@ describe('#bch', () => {
           .stub(uut.bchjs.Script, 'toASM')
           .callsFake(() => { return 'OP_RETURN 6d30 1da089f65bc1937e87894a69426c05041ef40cef 48656c6c6f2050534620436f6d6d756e697479203a44' })
 
+        const txid = '60fece763732d398aaf3afe44b4b5dcd81f61813accbd6b615cbf4815a74aac8'
+
         const tx = {
-          tx_hash: '60fece763732d398aaf3afe44b4b5dcd81f61813accbd6b615cbf4815a74aac8'
+          tx_hash: txid
         }
+
         const result = await uut.getMessageObj(tx)
-        assert.isFalse(result)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
+
+        assert.equal(result.txid, txid)
+        assert.equal(result.isValid, false)
       } catch (error) {
         assert.equal(true, false, 'Unexpected result!')
       }
     })
+
     it('should get messagesObject with memo code "6d24"', async () => {
       try {
         // Mock live network calls.
@@ -351,6 +368,7 @@ describe('#bch', () => {
         assert.equal(true, false, 'Unexpected result!')
       }
     })
+
     it('should get messagesObject with memo code "6d02"', async () => {
       try {
         // Mock live network calls.

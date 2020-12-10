@@ -30,7 +30,13 @@ class MessagesController {
       const blockHeightNow = await _this.bch.getBlockHeight()
       const limit = blockHeightNow - 3000
 
-      const messages = await _this.Message.find({ height: { $gte: limit } })
+      let messages = await _this.Message.find({ height: { $gte: limit } })
+      // console.log(`messages before filtering: ${JSON.stringify(messages, null, 2)}`)
+
+      // Filter out any messages marked 'invalid'
+      messages = messages.filter(elem => elem.isValid)
+      // console.log(`messages after filtering: ${JSON.stringify(messages, null, 2)}`)
+
       ctx.body = { messages }
     } catch (error) {
       console.log('error: ', error)
