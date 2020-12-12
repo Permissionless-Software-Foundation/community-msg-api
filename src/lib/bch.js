@@ -2,6 +2,10 @@
   Library of functions for working with the BCH blockchain.
 */
 
+// Constants
+const HISTORY = 50 // How many blocks to look for new messages.
+// const HISTORY = 2000
+
 // Global npm libraries.
 const BCHJS = require('@psf/bch-js')
 
@@ -250,7 +254,7 @@ class BCHLib {
       txs = txs.transactions
 
       const unconfirmedTxs = txs.filter(x => x.height === 0)
-      const confirmedTxs = txs.filter(x => x.height > blockHeightNow - 50)
+      const confirmedTxs = txs.filter(x => x.height > blockHeightNow - HISTORY)
 
       txs = confirmedTxs.concat(unconfirmedTxs)
 
