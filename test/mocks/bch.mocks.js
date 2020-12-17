@@ -287,11 +287,35 @@ const rawTransactions = {
   blocktime: 1607369490
 }
 
+// balance for address
+const tokenBalance = [{
+  balanceString: '1010',
+  slpAddress: 'simpleledger:qpnty9t0w93fez14h7yzevujpv8oun204qqp0jfafg',
+  tokenId: '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0',
+  balance: 1010,
+  decimalCount: 0
+}
+]
+
+//  Mock message model
+const msjObj = {
+  txid: 'da2ad45ab60e7b80b7c3952175a1752b8fabda537d5497e4d11cf5b898831d37',
+  isValid: true,
+  text: '\u001d \tv[A\u0013~\u0007\tJiBl\u0005\u0004\u001et\fo',
+  sender: 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8ma',
+  tokenBalance: 0,
+  tokenAge: 0,
+  merit: 0,
+  height: 649681,
+  timestamp: '2020-12-17T02:53:59.894Z'
+}
 module.exports = {
   blockchainInfo,
   txs,
   messages,
   mockTokenUtxos,
   meritHydratedUtxos,
-  rawTransactions
+  rawTransactions,
+  tokenBalance,
+  msjObj
 }
