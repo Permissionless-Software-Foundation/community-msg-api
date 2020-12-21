@@ -33,7 +33,7 @@ class BCHLib {
       // const newTxs = []
 
       const { txs, blockHeightNow } = await this.getTransactions()
-      console.log('txs: ', txs)
+      // console.log('txs: ', txs)
 
       // Loop through each txid.
       for (let i = 0; i < txs.length; i++) {

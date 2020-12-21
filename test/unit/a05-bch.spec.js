@@ -29,6 +29,22 @@ describe('#bch', () => {
 
       assert.isAbove(info, 649670)
     })
+    it('should handle error', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.Blockchain, 'getBlockchainInfo')
+          .throws(new Error('test error.'))
+
+        await uut.getBlockHeight()
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'test error.'
+        )
+      }
+    })
   })
   describe('#findName', () => {
     it('should throw an error if a bchAddr is not provided.', async () => {
@@ -368,7 +384,41 @@ describe('#bch', () => {
         assert.equal(true, false, 'Unexpected result!')
       }
     })
+    it('should return default merit if  cant get the psf token info', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.RawTransactions, 'getRawTransaction')
+          .resolves(mockData.rawTransactions)
 
+        sandbox
+          .stub(uut.bchjs.Script, 'toASM')
+          .callsFake(() => { return 'OP_RETURN 6d24 1da089f65bc1937e87894a69426c05041ef40cef 48656c6c6f2050534620436f6d6d756e697479203a44' })
+
+        sandbox
+          .stub(uut.messagesLib.merit, 'getTokenUtxos')
+          .resolves(mockData.mockTokenUtxos)
+
+        sandbox
+          .stub(uut.messagesLib.merit, 'calcMerit')
+          .throws(new Error('Test Error'))
+        const tx = {
+          tx_hash: '60fece763732d398aaf3afe44b4b5dcd81f61813accbd6b615cbf4815a74aac8'
+        }
+        const result = await uut.getMessageObj(tx)
+
+        assert.property(result, 'txid')
+        assert.property(result, 'text')
+        assert.property(result, 'height')
+        assert.property(result, 'merit')
+        assert.property(result, 'tokenAge')
+        assert.property(result, 'tokenBalance')
+        assert.property(result, 'sender')
+        assert.property(result, 'timestamp')
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
     it('should get messagesObject with memo code "6d02"', async () => {
       try {
         // Mock live network calls.
@@ -400,6 +450,234 @@ describe('#bch', () => {
         assert.property(result, 'tokenBalance')
         assert.property(result, 'sender')
         assert.property(result, 'timestamp')
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+  })
+  describe('#getTokenInfo', () => {
+    it('should handle error', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.SLP.Utils, 'balancesForAddress')
+          .throws(new Error('No balance for this address'))
+
+        const bchAddr = 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8ma'
+        await uut.getTokenInfo(bchAddr)
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (error) {
+        assert.include(
+          error.message,
+          'No balance for this address'
+        )
+      }
+    })
+    it('should get token info', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.SLP.Utils, 'balancesForAddress')
+          .resolves(mockData.tokenBalance)
+
+        const bchAddr = 'bitcoincash:qp0x969mxggq2ykvkt8x508kacauvq6hgy0ewpp8ma'
+        const result = await uut.getTokenInfo(bchAddr)
+
+        assert.property(result, 'tokenBalance')
+        assert.property(result, 'tokenAge')
+        assert.isNumber(result.tokenBalance)
+        assert.isNumber(result.tokenAge)
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+  })
+  describe('#getSender', () => {
+    it('should handle error', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.RawTransactions, 'getRawTransaction')
+          .throws(new Error('test error'))
+
+        await uut.getSender(mockData.rawTransactions)
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (error) {
+        assert.include(
+          error.message,
+          'test error'
+        )
+      }
+    })
+    it('should get sender', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.RawTransactions, 'getRawTransaction')
+          .resolves(mockData.rawTransactions)
+
+        const result = await uut.getSender(mockData.rawTransactions)
+
+        assert.isString(result)
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+  })
+
+  describe('#getTransactions', () => {
+    it('should handle error', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.Blockchain, 'getBlockchainInfo')
+          .resolves(mockData.blockchainInfo)
+        sandbox
+          .stub(uut.bchjs.Electrumx, 'transactions')
+          .throws(new Error('test error'))
+
+        await uut.getTransactions()
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (error) {
+        assert.include(
+          error.message,
+          'test error'
+        )
+      }
+    })
+    it('should get transactions', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.Blockchain, 'getBlockchainInfo')
+          .resolves(mockData.blockchainInfo)
+        sandbox
+          .stub(uut.bchjs.Electrumx, 'transactions')
+          .resolves({ success: true, transactions: mockData.txs })
+
+        const result = await uut.getTransactions()
+
+        assert.property(result, 'txs')
+        assert.property(result, 'blockHeightNow')
+
+        assert.isArray(result.txs)
+        assert.isNumber(result.blockHeightNow)
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+  })
+
+  describe('#checkMessages', () => {
+    it('should skip error if it exist', async () => {
+      try {
+        // Mock live network calls.
+        sandbox
+          .stub(uut.bchjs.Blockchain, 'getBlockchainInfo')
+          .throws(new Error('test error'))
+
+        await uut.checkMessages()
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+    it('should ignore messages if it exist', async () => {
+      try {
+        // Mock live network calls.
+
+        // Mock getTransaction calls
+        sandbox
+          .stub(uut.bchjs.Blockchain, 'getBlockchainInfo')
+          .resolves(mockData.blockchainInfo)
+        sandbox
+          .stub(uut.bchjs.Electrumx, 'transactions')
+          .resolves({ success: true, transactions: mockData.txs })
+
+        await uut.checkMessages()
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+    it('should store invalid messages', async () => {
+      try {
+        // Mock live network calls.
+
+        // Mock getTransaction calls
+        sandbox
+          .stub(uut.bchjs.Blockchain, 'getBlockchainInfo')
+          .resolves(mockData.blockchainInfo)
+        sandbox
+          .stub(uut.bchjs.Electrumx, 'transactions')
+          .resolves({ success: true, transactions: mockData.txs })
+
+        // Mock db response
+        sandbox
+          .stub(uut.Message, 'find')
+          .resolves([])
+
+        //  Mock get getMessageObj
+        const msjOb = mockData.msjObj
+        msjOb.isValid = false
+        sandbox
+          .stub(uut, 'getMessageObj')
+          .resolves(msjOb)
+
+        await uut.checkMessages()
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+    it('should store valid messages', async () => {
+      try {
+        // Mock live network calls.
+
+        // Mock getTransaction calls
+        sandbox
+          .stub(uut.bchjs.Blockchain, 'getBlockchainInfo')
+          .resolves(mockData.blockchainInfo)
+        sandbox
+          .stub(uut.bchjs.Electrumx, 'transactions')
+          .resolves({ success: true, transactions: mockData.txs })
+
+        // Mock db response
+        sandbox
+          .stub(uut.Message, 'find')
+          .resolves([])
+
+        //  Mock get getMessageObj
+        sandbox
+          .stub(uut, 'getMessageObj')
+          .resolves(mockData.msjObj)
+
+        await uut.checkMessages()
+      } catch (error) {
+        assert.equal(true, false, 'Unexpected result!')
+      }
+    })
+
+    it('should skip if getMessageObj dont return a value', async () => {
+      try {
+        // Mock live network calls.
+
+        // Mock getTransaction calls
+        sandbox
+          .stub(uut.bchjs.Blockchain, 'getBlockchainInfo')
+          .resolves(mockData.blockchainInfo)
+        sandbox
+          .stub(uut.bchjs.Electrumx, 'transactions')
+          .resolves({ success: true, transactions: mockData.txs })
+
+        // Mock db response
+        sandbox
+          .stub(uut.Message, 'find')
+          .resolves([])
+
+        // Mock  getMessageObj
+        sandbox
+          .stub(uut, 'getMessageObj')
+          .resolves(undefined)
+
+        await uut.checkMessages()
       } catch (error) {
         assert.equal(true, false, 'Unexpected result!')
       }
