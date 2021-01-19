@@ -21,10 +21,10 @@
   },
   "repository": "Permissionless-Software-Foundation/community-msg-api",
   "dependencies": {
-    "@psf/bch-js": "^4.2.0",
+    "@psf/bch-js": "^4.6.0",
     "apidoc": "^0.23.0",
-    "axios": "^0.19.2",
-    "bch-message-lib": "^1.8.1",
+    "axios": "^0.21.1",
+    "bch-message-lib": "^1.12.0",
     "bcryptjs": "^2.4.3",
     "glob": "^7.0.0",
     "jsonwebtoken": "^8.3.0",
