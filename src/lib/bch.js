@@ -19,7 +19,7 @@ const LOCALHOST = `http://localhost:${config.port}`
 
 class BCHLib {
   constructor () {
-    this.bchjs = new BCHJS({ restURL: 'https://free-main.fullstack.cash/v3/' })
+    this.bchjs = new BCHJS()
     this.Message = Message
     this.messagesLib = new MessagesLib({ bchjs: this.bchjs })
     this.axios = axios
