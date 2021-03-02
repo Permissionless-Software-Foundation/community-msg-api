@@ -78,6 +78,10 @@ class NamesController {
             name = nameModel.name || 'notAvailable'
           }
         } catch (error) {
+          console.log(
+            'Error finding name. Skipping. Error message: ',
+            error.message
+          )
           // if the function returs false use the stored
           // name in the database if it exists
           // otherwise return "notAvailable"
