@@ -10,7 +10,7 @@ util.inspect.defaultOptions = { depth: 1 }
 const LOCALHOST = `http://localhost:${config.port}`
 
 const MailsController = require('../../src/modules/mail/controller')
-const mockContext = require('../mocks/ctx-mock').context
+const mockContext = require('./mocks/ctx-mock').context
 const mockData = require('../mocks/bch.mocks')
 
 let sandbox

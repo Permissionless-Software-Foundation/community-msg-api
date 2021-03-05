@@ -15,7 +15,7 @@ const UserController = require('../../src/modules/users/controller')
 let uut
 let sandbox
 
-const mockContext = require('../mocks/ctx-mock').context
+const mockContext = require('./mocks/ctx-mock').context
 
 describe('Users', () => {
   before(async () => {

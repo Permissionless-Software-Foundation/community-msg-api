@@ -9,7 +9,7 @@ const LOCALHOST = `http://localhost:${config.port}`
 const Names = require('../../src/modules/names/controller')
 const NameModel = require('../../src/models/name')
 
-const mockContext = require('../mocks/ctx-mock').context
+const mockContext = require('./mocks/ctx-mock').context
 
 let uut = {}
 let sandbox
