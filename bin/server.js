@@ -84,15 +84,17 @@ async function startServer () {
   if (success) console.log('System admin user created.')
 
   // Get the JWT token needed to interact with the FullStack.cash API.
-  await getJwt()
-  bch = new BCH() // Reinitialize bchjs with the JWT token.
-
-  // Renew the JWT token every 24 hours
-  setInterval(async function () {
-    wlogger.info('Updating FullStack.cash JWT token')
+  if (process.env.FULLSTACKLOGIN) {
     await getJwt()
     bch = new BCH() // Reinitialize bchjs with the JWT token.
-  }, 60000 * 60 * 24)
+
+    // Renew the JWT token every 24 hours
+    setInterval(async function () {
+      wlogger.info('Updating FullStack.cash JWT token')
+      await getJwt()
+      bch = new BCH() // Reinitialize bchjs with the JWT token.
+    }, 60000 * 60 * 24)
+  }
 
   // setInterval(async function () {
   //   const now = new Date()

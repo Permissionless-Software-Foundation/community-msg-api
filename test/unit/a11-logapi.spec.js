@@ -221,6 +221,7 @@ describe('LogsApi', () => {
         assert.include(err.message, 'file does not exist')
       }
     })
+
     it('should ignore fileReader callback errors', async () => {
       try {
         // https://sinonjs.org/releases/latest/stubs/
@@ -234,16 +235,19 @@ describe('LogsApi', () => {
         assert.fail('Unexpected result')
       }
     })
+
     it('should return data', async () => {
       try {
         const fileName = context.fileName
         const result = await uut.readLines(fileName)
+        // console.log(`result: ${JSON.stringify(result, null, 2)}`)
 
         assert.isArray(result)
-        assert.property(result[1], 'message')
-        assert.property(result[1], 'level')
-        assert.property(result[1], 'timestamp')
+        assert.property(result[0], 'message')
+        assert.property(result[0], 'level')
+        assert.property(result[0], 'timestamp')
       } catch (err) {
+        // console.log('err: ', err)
         assert.fail('Unexpected result')
       }
     })
