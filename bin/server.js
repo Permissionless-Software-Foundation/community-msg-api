@@ -19,7 +19,7 @@ const adminLib = new AdminLib()
 const errorMiddleware = require('../src/middleware')
 const wlogger = require('../src/lib/wlogger')
 const BCH = require('../src/lib/bch')
-const bch = new BCH()
+let bch = new BCH()
 
 const JwtLib = require('jwt-bch-lib')
 const jwtLib = new JwtLib({
@@ -28,7 +28,6 @@ const jwtLib = new JwtLib({
   login: process.env.FULLSTACKLOGIN,
   password: process.env.FULLSTACKPASS
 })
-console.log('jwtLib: ', jwtLib)
 
 async function startServer () {
   // Create a Koa instance.
@@ -83,6 +82,17 @@ async function startServer () {
   // Create the system admin user.
   const success = await adminLib.createSystemUser()
   if (success) console.log('System admin user created.')
+
+  // Get the JWT token needed to interact with the FullStack.cash API.
+  await getJwt()
+  bch = new BCH() // Reinitialize bchjs with the JWT token.
+
+  // Renew the JWT token every 24 hours
+  setInterval(async function () {
+    wlogger.info('Updating FullStack.cash JWT token')
+    await getJwt()
+    bch = new BCH() // Reinitialize bchjs with the JWT token.
+  }, 60000 * 60 * 24)
 
   // setInterval(async function () {
   //   const now = new Date()
@@ -141,4 +151,34 @@ async function periodicallyScanForMessages () {
 
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+// Get's a JWT token from FullStack.cash.
+// This code based on the jwt-bch-demo:
+// https://github.com/Permissionless-Software-Foundation/jwt-bch-demo
+async function getJwt () {
+  try {
+    // Log into the auth server.
+    await jwtLib.register()
+
+    let apiToken = jwtLib.userData.apiToken
+
+    // Ensure the JWT token is valid to use.
+    const isValid = await jwtLib.validateApiToken()
+
+    // Get a new token with the same API level, if the existing token is not
+    // valid (probably expired).
+    if (!isValid.isValid) {
+      apiToken = await jwtLib.getApiToken(jwtLib.userData.apiLevel)
+      console.log('The JWT token was not valid. Retrieved new JWT token.\n')
+    } else {
+      console.log('JWT token is valid.\n')
+    }
+
+    // Set the environment variable.
+    process.env.BCHJSTOKEN = apiToken
+  } catch (err) {
+    wlogger.error('Error in token-liquidity.js/getJwt(): ', err)
+    throw err
+  }
 }
