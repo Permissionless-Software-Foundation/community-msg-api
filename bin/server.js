@@ -21,6 +21,15 @@ const wlogger = require('../src/lib/wlogger')
 const BCH = require('../src/lib/bch')
 const bch = new BCH()
 
+const JwtLib = require('jwt-bch-lib')
+const jwtLib = new JwtLib({
+  // Overwrite default values with the values in the config file.
+  server: 'https://auth.fullstack.cash',
+  login: process.env.FULLSTACKLOGIN,
+  password: process.env.FULLSTACKPASS
+})
+console.log('jwtLib: ', jwtLib)
+
 async function startServer () {
   // Create a Koa instance.
   const app = new Koa()
