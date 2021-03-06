@@ -10,8 +10,8 @@ util.inspect.defaultOptions = { depth: 1 }
 const LOCALHOST = `http://localhost:${config.port}`
 
 const LogsController = require('../../src/modules/logapi/controller')
-const mockContext = require('../mocks/ctx-mock').context
-const mockData = require('../mocks/log-api-mock')
+const mockContext = require('./mocks/ctx-mock').context
+const mockData = require('./mocks/log-api-mock')
 
 const context = {}
 let sandbox

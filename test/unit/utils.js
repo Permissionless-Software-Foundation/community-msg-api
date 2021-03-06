@@ -79,7 +79,7 @@ async function loginTestUser () {
 
 async function loginAdminUser () {
   try {
-    const FILENAME = `../config/system-user-${config.env}.json`
+    const FILENAME = `../../config/system-user-${config.env}.json`
     const adminUserData = require(FILENAME)
     console.log(`adminUserData: ${JSON.stringify(adminUserData, null, 2)}`)
 

@@ -4,7 +4,7 @@ const testUtils = require('./utils')
 const Validators = require('../../src/middleware/validators')
 
 const sinon = require('sinon')
-const mockContext = require('../mocks/ctx-mock').context
+const mockContext = require('./mocks/ctx-mock').context
 
 const util = require('util')
 util.inspect.defaultOptions = { depth: 1 }
