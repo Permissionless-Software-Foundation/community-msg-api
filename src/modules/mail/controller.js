@@ -37,11 +37,13 @@ class MailController {
     try {
       const bchAddr = ctx.params.bchAddr
 
-      const numChunks = 0
+      const numChunks = 1
       const mail = await _this.bch.readMessages(bchAddr, numChunks)
 
       ctx.body = { mail }
     } catch (err) {
+      console.log('Error in GET /mail/:address messages: ', err)
+
       ctx.throw(404)
     }
   }
