@@ -324,9 +324,6 @@ class BCHLib {
     } catch (error) {
       console.error('Error in bch.js/readMessages()')
 
-      // 4/20/21 CT: Reporting error to console so it's logged to pm2.
-      console.log('Error in bch.js/readMessage(): ', error)
-
       throw error
     }
   }
