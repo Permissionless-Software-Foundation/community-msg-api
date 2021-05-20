@@ -37,7 +37,7 @@ class MailController {
     try {
       const bchAddr = ctx.params.bchAddr
 
-      const numChunks = 1
+      const numChunks = 2
       const mail = await _this.bch.readMessages(bchAddr, numChunks)
 
       ctx.body = { mail }
